@@ -5,7 +5,6 @@ Runs inside GitHub Actions — no secrets needed (LeetCode's GraphQL API is publ
 
 import re
 import sys
-import json
 import requests
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
@@ -25,26 +24,6 @@ query getUserProfile($username: String!) {
       }
     }
   }
-  userContestRanking(username: $username) {
-    rating
-  }
-}
-"""
-
-ACCEPTANCE_QUERY = """
-query getUserSolvedProblems($username: String!) {
-  matchedUser(username: $username) {
-    problemsSolvedBeatsStats {
-      difficulty
-      percentage
-    }
-    submitStatsGlobal {
-      acSubmissionNum {
-        difficulty
-        count
-      }
-    }
-  }
 }
 """
 
@@ -54,12 +33,10 @@ def fetch_stats():
         "Referer": "https://leetcode.com",
         "User-Agent": "Mozilla/5.0"
     }
-
     payload = {
         "query": QUERY,
         "variables": {"username": USERNAME}
     }
-
     resp = requests.post(LEETCODE_GRAPHQL, json=payload, headers=headers, timeout=15)
     resp.raise_for_status()
     data = resp.json()
@@ -78,27 +55,16 @@ def fetch_stats():
     medium = counts.get("Medium", 0)
     hard   = counts.get("Hard",   0)
 
-    return {
-        "total":  total,
-        "easy":   easy,
-        "medium": medium,
-        "hard":   hard,
-    }
+    print(f"  Fetched from LeetCode API:")
+    print(f"    Total:  {total}")
+    print(f"    Easy:   {easy}")
+    print(f"    Medium: {medium}")
+    print(f"    Hard:   {hard}")
+
+    return {"total": total, "easy": easy, "medium": medium, "hard": hard}
 
 
 def fetch_acceptance():
-    """
-    Acceptance rate = accepted submissions / total submissions.
-    LeetCode doesn't expose this directly in the public API,
-    so we compute it from submission stats.
-    """
-    headers = {
-        "Content-Type": "application/json",
-        "Referer": "https://leetcode.com",
-        "User-Agent": "Mozilla/5.0"
-    }
-
-    # Use the public profile stats endpoint
     url = f"https://leetcode-stats-api.herokuapp.com/{USERNAME}"
     try:
         resp = requests.get(url, timeout=10)
@@ -106,11 +72,11 @@ def fetch_acceptance():
         d = resp.json()
         rate = d.get("acceptanceRate", None)
         if rate is not None:
-            return round(float(rate), 1)
-    except Exception:
-        pass
-
-    # Fallback: return None so we keep whatever's in the HTML
+            result = round(float(rate), 1)
+            print(f"    Acceptance: {result}%")
+            return result
+    except Exception as e:
+        print(f"  Acceptance rate fetch failed (non-critical): {e}")
     return None
 
 
@@ -120,71 +86,74 @@ def patch_html(stats, acceptance):
 
     original = html
 
-    # ── Total problems solved ──────────────────────────────────────────────────
-    # Targets: <span class="lc-num ...">27</span>  (the total in metric-card)
-    # We look for the metric-card that contains "Problems Solved"
-    html = re.sub(
-        r'(<span class="metric-value"[^>]*>)\d+(<\/span>\s*<span class="metric-label">Problems Solved)',
-        rf'\g<1>{stats["total"]}\2',
-        html
-    )
+    # ── Easy ──────────────────────────────────────────────────────────────────
+    pattern = r'(<span class="lc-num easy">)\d+(<\/span>)'
+    match = re.search(pattern, html)
+    if match:
+        print(f"  Easy: found '{match.group(0)}' → replacing with {stats['easy']}")
+        html = re.sub(pattern, rf'\g<1>{stats["easy"]}\2', html)
+    else:
+        print("  WARNING: Easy pattern not found in HTML")
 
-    # ── Easy count ────────────────────────────────────────────────────────────
-    html = re.sub(
-        r'(<span class="lc-num easy">)\d+(<\/span>)',
-        rf'\g<1>{stats["easy"]}\2',
-        html
-    )
+    # ── Medium ────────────────────────────────────────────────────────────────
+    pattern = r'(<span class="lc-num medium">)\d+(<\/span>)'
+    match = re.search(pattern, html)
+    if match:
+        print(f"  Medium: found '{match.group(0)}' → replacing with {stats['medium']}")
+        html = re.sub(pattern, rf'\g<1>{stats["medium"]}\2', html)
+    else:
+        print("  WARNING: Medium pattern not found in HTML")
 
-    # ── Medium count ──────────────────────────────────────────────────────────
-    html = re.sub(
-        r'(<span class="lc-num medium">)\d+(<\/span>)',
-        rf'\g<1>{stats["medium"]}\2',
-        html
-    )
+    # ── Hard ──────────────────────────────────────────────────────────────────
+    pattern = r'(<span class="lc-num hard">)\d+(<\/span>)'
+    match = re.search(pattern, html)
+    if match:
+        print(f"  Hard: found '{match.group(0)}' → replacing with {stats['hard']}")
+        html = re.sub(pattern, rf'\g<1>{stats["hard"]}\2', html)
+    else:
+        print("  WARNING: Hard pattern not found in HTML")
 
-    # ── Hard count ────────────────────────────────────────────────────────────
-    html = re.sub(
-        r'(<span class="lc-num hard">)\d+(<\/span>)',
-        rf'\g<1>{stats["hard"]}\2',
-        html
-    )
+    # ── Total (metric-value above "Problems Solved") ───────────────────────────
+    pattern = r'(<span class="metric-value">)\d+(<\/span>\s*<span class="metric-label">Problems Solved)'
+    match = re.search(pattern, html)
+    if match:
+        print(f"  Total: found → replacing with {stats['total']}")
+        html = re.sub(pattern, rf'\g<1>{stats["total"]}\2', html)
+    else:
+        print("  WARNING: Total problems pattern not found in HTML")
 
     # ── Acceptance rate ───────────────────────────────────────────────────────
     if acceptance is not None:
-        html = re.sub(
-            r'(<span class="metric-value"[^>]*>)[\d.]+(%?<\/span>\s*<span class="metric-label">Acceptance Rate)',
-            rf'\g<1>{acceptance}%\2',
-            html
-        )
+        pattern = r'(<span class="metric-value">)[\d.]+%(<\/span>\s*<span class="metric-label">Acceptance Rate)'
+        match = re.search(pattern, html)
+        if match:
+            print(f"  Acceptance: found → replacing with {acceptance}%")
+            html = re.sub(pattern, rf'\g<1>{acceptance}%\2', html)
+        else:
+            print("  WARNING: Acceptance rate pattern not found in HTML")
 
-    # ── "27+ Problems" goal line  ─────────────────────────────────────────────
-    # Updates the "X+ problems solved" display in the lc-goal line
-    html = re.sub(
-        r'(Goal:\s*<span>)\d+\+(\s*problems)',
-        rf'\g<1>{stats["total"] + 1}+\2',  # keep the + notation
-        html
-    )
+    # ── Goal line ─────────────────────────────────────────────────────────────
+    pattern = r'(Goal:\s*<span>)\d+\+(\s*problems)'
+    match = re.search(pattern, html)
+    if match:
+        goal = stats["total"] + 50  # always shows ~50 ahead as the next milestone
+        print(f"  Goal line: updating to {goal}+")
+        html = re.sub(pattern, rf'\g<1>{goal}+\2', html)
 
+    # ── Write back ────────────────────────────────────────────────────────────
     if html == original:
-        print("No changes detected — stats are already up to date.")
+        print("\nNo changes detected — stats already up to date in HTML.")
     else:
         with open(HTML_FILE, "w", encoding="utf-8") as f:
             f.write(html)
-        print(f"✅ Portfolio updated:")
-        print(f"   Total:    {stats['total']}")
-        print(f"   Easy:     {stats['easy']}")
-        print(f"   Medium:   {stats['medium']}")
-        print(f"   Hard:     {stats['hard']}")
-        if acceptance:
-            print(f"   Acceptance: {acceptance}%")
+        print(f"\n✅ index.html updated successfully.")
 
 
 def main():
     print(f"Fetching LeetCode stats for @{USERNAME}...")
     stats      = fetch_stats()
     acceptance = fetch_acceptance()
-    print(f"Got: total={stats['total']}, easy={stats['easy']}, medium={stats['medium']}, hard={stats['hard']}")
+    print(f"\nPatching {HTML_FILE}...")
     patch_html(stats, acceptance)
 
 
