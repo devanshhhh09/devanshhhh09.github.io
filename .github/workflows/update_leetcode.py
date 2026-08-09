@@ -113,14 +113,41 @@ def patch_html(stats, acceptance):
     else:
         print("  WARNING: Hard pattern not found in HTML")
 
-    # ── Total (metric-value above "Problems Solved") ───────────────────────────
-    pattern = r'(<span class="metric-value">)\d+(<\/span>\s*<span class="metric-label">Problems Solved)'
+    # ── Total (data-lc-total attribute — drives typewriter + about section) ────
+    pattern = r'(<span class="mv" data-lc-total>)\d+(<\/span>)'
     match = re.search(pattern, html)
     if match:
         print(f"  Total: found → replacing with {stats['total']}")
         html = re.sub(pattern, rf'\g<1>{stats["total"]}\2', html)
     else:
         print("  WARNING: Total problems pattern not found in HTML")
+
+    # ── About section inline count ────────────────────────────────────────────
+    pattern = r'(<span data-lc-about>)\d+(<\/span>)'
+    match = re.search(pattern, html)
+    if match:
+        print(f"  About text: found → replacing with {stats['total']}")
+        html = re.sub(pattern, rf'\g<1>{stats["total"]}\2', html)
+    else:
+        print("  WARNING: About section count pattern not found in HTML")
+
+    # ── Fact chip count ───────────────────────────────────────────────────────
+    pattern = r'(<span data-lc-chip>)\d+(<\/span>)'
+    match = re.search(pattern, html)
+    if match:
+        print(f"  Fact chip: found → replacing with {stats['total']}")
+        html = re.sub(pattern, rf'\g<1>{stats["total"]}\2', html)
+    else:
+        print("  WARNING: Fact chip pattern not found in HTML")
+
+    # ── Skills subtitle count ─────────────────────────────────────────────────
+    pattern = r'(<span data-lc-sub>)\d+(<\/span>)'
+    match = re.search(pattern, html)
+    if match:
+        print(f"  Skills subtitle: found → replacing with {stats['total']}")
+        html = re.sub(pattern, rf'\g<1>{stats["total"]}\2', html)
+    else:
+        print("  WARNING: Skills subtitle pattern not found in HTML")
 
     # ── Acceptance rate ───────────────────────────────────────────────────────
     if acceptance is not None:
