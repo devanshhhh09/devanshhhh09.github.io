@@ -13,8 +13,17 @@ jobs:
       contents: write      # needed to push changes back to the repo
 
     steps:
-      - name: Checkout repository
+      - name: Checkout portfolio repo
         uses: actions/checkout@v4.2.2
+        with:
+          path: portfolio
+
+      - name: Checkout profile README repo
+        uses: actions/checkout@v4.2.2
+        with:
+          repository: devanshhhh09/devanshhhh09
+          path: profile
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5.6.0
@@ -24,13 +33,29 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Fetch LeetCode stats and update portfolio
-        run: python .github/workflows/update_leetcode.py
-
-      - name: Commit and push if stats changed
+      - name: Fetch LeetCode stats and update both files
         run: |
+          cp portfolio/.github/workflows/update_leetcode.py ./update_leetcode.py
+          cp portfolio/index.html ./index.html
+          cp profile/README.md ./README.md
+          python update_leetcode.py
+          cp index.html portfolio/index.html
+          cp README.md profile/README.md
+
+      - name: Commit and push portfolio (index.html)
+        run: |
+          cd portfolio
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html
+          git diff --cached --quiet || git commit -m "chore: auto-update LeetCode stats [$(date +'%Y-%m-%d')]"
+          git push
+
+      - name: Commit and push profile README
+        run: |
+          cd profile
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
           git diff --cached --quiet || git commit -m "chore: auto-update LeetCode stats [$(date +'%Y-%m-%d')]"
           git push
