@@ -176,12 +176,53 @@ def patch_html(stats, acceptance):
         print(f"\n✅ index.html updated successfully.")
 
 
+def patch_readme(stats, acceptance):
+    try:
+        with open("README.md", "r", encoding="utf-8") as f:
+            readme = f.read()
+    except FileNotFoundError:
+        print("  README.md not found — skipping.")
+        return
+
+    original = readme
+
+    # Replace everything between LC_STATS_START and LC_STATS_END
+    acceptance_str = f"{acceptance}%" if acceptance else "N/A"
+    new_block = f"""<!-- LC_STATS_START -->
+| | Count |
+|---|---|
+| ✅ **Total Solved** | **{stats['total']}** |
+| 🟢 **Easy** | {stats['easy']} |
+| 🟡 **Medium** | {stats['medium']} |
+| 🔴 **Hard** | {stats['hard']} |
+| 📊 **Acceptance Rate** | {acceptance_str} |
+| 💻 **Language** | C++ |
+| 🎯 **Goal** | 250+ by December 2026 |
+<!-- LC_STATS_END -->"""
+
+    readme = re.sub(
+        r'<!-- LC_STATS_START -->.*?<!-- LC_STATS_END -->',
+        new_block,
+        readme,
+        flags=re.DOTALL
+    )
+
+    if readme == original:
+        print("  README: No changes.")
+    else:
+        with open("README.md", "w", encoding="utf-8") as f:
+            f.write(readme)
+        print(f"  ✅ README.md updated.")
+
+
 def main():
     print(f"Fetching LeetCode stats for @{USERNAME}...")
     stats      = fetch_stats()
     acceptance = fetch_acceptance()
     print(f"\nPatching {HTML_FILE}...")
     patch_html(stats, acceptance)
+    print(f"\nPatching README.md...")
+    patch_readme(stats, acceptance)
 
 
 if __name__ == "__main__":
