@@ -189,15 +189,40 @@ def patch_readme(stats, acceptance):
     # Replace everything between LC_STATS_START and LC_STATS_END
     acceptance_str = f"{acceptance}%" if acceptance else "N/A"
     new_block = f"""<!-- LC_STATS_START -->
-| | Count |
-|---|---|
-| ✅ **Total Solved** | **{stats['total']}** |
-| 🟢 **Easy** | {stats['easy']} |
-| 🟡 **Medium** | {stats['medium']} |
-| 🔴 **Hard** | {stats['hard']} |
-| 📊 **Acceptance Rate** | {acceptance_str} |
-| 💻 **Language** | C++ |
-| 🎯 **Goal** | 250+ by December 2026 |
+<div align="center">
+
+<table>
+<tr>
+<td align="center">✅ <b>Total Solved</b></td>
+<td align="center"><b>{stats['total']}</b></td>
+</tr>
+<tr>
+<td align="center">🟢 <b>Easy</b></td>
+<td align="center">{stats['easy']}</td>
+</tr>
+<tr>
+<td align="center">🟡 <b>Medium</b></td>
+<td align="center">{stats['medium']}</td>
+</tr>
+<tr>
+<td align="center">🔴 <b>Hard</b></td>
+<td align="center">{stats['hard']}</td>
+</tr>
+<tr>
+<td align="center">📊 <b>Acceptance Rate</b></td>
+<td align="center">{acceptance_str}</td>
+</tr>
+<tr>
+<td align="center">💻 <b>Language</b></td>
+<td align="center">C++</td>
+</tr>
+<tr>
+<td align="center">🎯 <b>Goal</b></td>
+<td align="center">250+ by December 2026</td>
+</tr>
+</table>
+
+</div>
 <!-- LC_STATS_END -->"""
 
     readme = re.sub(
