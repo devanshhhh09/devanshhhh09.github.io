@@ -232,6 +232,26 @@ def patch_readme(stats, acceptance):
         flags=re.DOTALL
     )
 
+    # ── Google & Amazon Readiness line ────────────────────────────────────────
+    ready_line = f"<!-- LC_READY_START -->Programming (C++)    ████████████████░░░░  {stats['total']}+ LeetCode · Daily Practice<!-- LC_READY_END -->"
+    readme = re.sub(
+        r'<!-- LC_READY_START -->.*?<!-- LC_READY_END -->',
+        ready_line,
+        readme,
+        flags=re.DOTALL
+    )
+    print(f"  Readiness line: updated to {stats['total']}+")
+
+    # ── Typing SVG URL ────────────────────────────────────────────────────────
+    typing_line = f"<!-- LC_TYPING_START -->[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=JetBrains+Mono&weight=600&size=16&duration=3000&pause=1000&color=4285F4&center=true&vCenter=true&repeat=true&width=600&lines=Building+PoliceOSINT+for+Gurugram+Police;DSA+in+C%2B%2B+%7C+{stats['total']}%2B+LeetCode+Solved;Targeting+Google+%26+Amazon+SWE+Roles)](https://git.io/typing-svg)<!-- LC_TYPING_END -->"
+    readme = re.sub(
+        r'<!-- LC_TYPING_START -->.*?<!-- LC_TYPING_END -->',
+        typing_line,
+        readme,
+        flags=re.DOTALL
+    )
+    print(f"  Typing SVG: updated to {stats['total']}+")
+
     if readme == original:
         print("  README: No changes.")
     else:
