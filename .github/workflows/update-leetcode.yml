@@ -10,20 +10,21 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write      # needed to push changes back to the repo
+      contents: write
 
     steps:
       - name: Checkout portfolio repo
         uses: actions/checkout@v4.2.2
         with:
           path: portfolio
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Checkout profile README repo
         uses: actions/checkout@v4.2.2
         with:
           repository: devanshhhh09/devanshhhh09
           path: profile
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5.6.0
@@ -47,6 +48,7 @@ jobs:
           cd portfolio
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/devanshhhh09/devanshhhh09.github.io.git
           git add index.html
           git diff --cached --quiet || git commit -m "chore: auto-update LeetCode stats [$(date +'%Y-%m-%d')]"
           git push
@@ -56,6 +58,7 @@ jobs:
           cd profile
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/devanshhhh09/devanshhhh09.git
           git add README.md
           git diff --cached --quiet || git commit -m "chore: auto-update LeetCode stats [$(date +'%Y-%m-%d')]"
           git push
