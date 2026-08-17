@@ -251,7 +251,7 @@ System Design        ████████████░░░░░░░�
     print(f"  Readiness block: updated to {stats['total']}+")
 
     # ── Typing SVG URL ────────────────────────────────────────────────────────
-    typing_line = f"<!-- LC_TYPING_START -->[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=JetBrains+Mono&weight=600&size=16&duration=3000&pause=1000&color=4285F4&center=true&vCenter=true&repeat=true&width=600&lines=Building+PoliceOSINT+for+Gurugram+Police;DSA+in+C%2B%2B+%7C+{stats['total']}%2B+LeetCode+Solved;Targeting+Google+%26+Amazon+SWE+Roles)](https://git.io/typing-svg)<!-- LC_TYPING_END -->"
+    typing_line = f'<!-- LC_TYPING_START --><img src="https://readme-typing-svg.herokuapp.com?font=JetBrains+Mono&amp;weight=600&amp;size=16&amp;duration=3000&amp;pause=1000&amp;color=4285F4&amp;center=true&amp;vCenter=true&amp;repeat=true&amp;width=600&amp;lines=Building+PoliceOSINT+for+Gurugram+Police;DSA+in+C%2B%2B+%7C+{stats["total"]}%2B+LeetCode+Solved;Targeting+Google+%26+Amazon+SWE+Roles" alt="Typing SVG" /><!-- LC_TYPING_END -->'
     readme = re.sub(
         r'<!-- LC_TYPING_START -->.*?<!-- LC_TYPING_END -->',
         typing_line,
