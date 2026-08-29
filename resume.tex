@@ -1,0 +1,113 @@
+%-------------------------
+% ATS Resume — Devansh Yadav — Single Page Guaranteed
+%-------------------------
+\documentclass[letterpaper,10pt]{article}
+\usepackage{titlesec}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage[protrusion=true,expansion=true]{microtype}
+\input{glyphtounicode}
+\pdfgentounicode=1
+\pagestyle{fancy}\fancyhf{}\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0pt}
+\setlength{\footskip}{4pt}
+\usepackage[top=0.28in,bottom=0.28in,left=0.42in,right=0.42in]{geometry}
+\urlstyle{same}\raggedbottom\raggedright\setlength{\tabcolsep}{0in}
+\titleformat{\section}{\vspace{-6pt}\bfseries\small\raggedright}{}{0em}{}[\titlerule\vspace{-5pt}]
+\renewcommand\labelitemi{\textbullet}
+\newcommand{\rI}[1]{\item\small{#1}}
+\newcommand{\rSH}[4]{%
+  \vspace{1.5pt}\noindent
+  \begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}r@{}}
+    \textbf{\small #1} & \small #2 \\[0.3pt]
+    \textit{\small #3} & \textit{\small #4} \\[1.5pt]
+  \end{tabular*}}
+\newcommand{\rPH}[2]{%
+  \vspace{1.5pt}\noindent
+  \begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}r@{}}
+    \small #1 & \small #2 \\[1.5pt]
+  \end{tabular*}}
+\newcommand{\rLS}{\begin{itemize}[leftmargin=0.13in,label=\textbullet,topsep=0pt,itemsep=0pt,parsep=0pt]}
+\newcommand{\rLE}{\end{itemize}\vspace{1.5pt}}
+\begin{document}
+\fontsize{8.5pt}{10.5pt}\selectfont
+
+% HEADING
+\begin{center}
+{\normalsize\textbf{Devansh Yadav}}\\[1pt]
+\small Software Engineer \textbullet\ Distributed Systems \textbullet\ AI Integration \textbullet\ Cyber Security\\[1.5pt]
+\small +91-7607742455 \textbar\
+\href{mailto:contact.devanshyadav@gmail.com}{contact.devanshyadav@gmail.com} \textbar\
+\href{https://linkedin.com/in/devansh-yadav-11209940b}{linkedin.com/in/devansh-yadav} \textbar\
+\href{https://github.com/devanshhhh09}{github.com/devanshhhh09} \textbar\
+\href{https://devanshhhh09.github.io}{devanshhhh09.github.io} \textbar\
+\href{https://leetcode.com/u/devanshhhh09}{leetcode.com/devanshhhh09}
+\end{center}
+\vspace{-5pt}
+
+% SUMMARY
+\section{Professional Summary}
+\vspace{1pt}{\small CSE undergraduate with \textbf{2 government internships}, a published research paper (NCMPCS-2026), and \textbf{PoliceOSINT v1.0} deployed at Gurugram Police -- a distributed OSINT platform (Next.js, FastAPI, Celery, Redis, Groq/LLaMA 3.3 70b). Solved \textbf{%%LC_TOTAL%% LeetCode problems} (%%LC_HARD%% Hard, %%LC_ACCEPT%% acceptance). I architect, test, and ship systems that work in the real world. Graduating May 2027.}\vspace{1pt}
+
+% SKILLS
+\section{Technical Skills}
+\vspace{1pt}{\small\begin{tabular}{@{\hspace{0.08in}}l@{\hspace{5pt}}l}
+\textbf{Languages}           & Python, C++, TypeScript, Bash, C \\[0.4pt]
+\textbf{Frameworks}          & FastAPI, Next.js 14, React, SQLAlchemy, ReportLab \\[0.4pt]
+\textbf{Distributed Systems} & Celery, Redis, Docker, Nginx, Async Task Queues, Concurrent Pipelines \\[0.4pt]
+\textbf{Databases}           & PostgreSQL, Redis \\[0.4pt]
+\textbf{AI / ML}             & Groq, Llama 3.3 70b, Random Forest, SVM, Gradient Boosting, scikit-learn \\[0.4pt]
+\textbf{Security \& OSINT}   & Blockchain Tracing, GeoIP, IPDR Analysis, SHA-256, Etherscan API, TronScan API \\[0.4pt]
+\textbf{Developer Tools}     & Git, Linux, Docker, GitHub Actions, Jupyter Notebook \\
+\end{tabular}}\vspace{1pt}
+
+% EXPERIENCE
+\section{Work Experience}
+\rSH{Software Engineering Intern}{June 2026}{Gurugram Police Cyber Security Summer Internship (GPCSSI), 13th Batch -- Gurugram, Haryana}{4 Weeks}
+\rLS
+  \rI{Architected and shipped \textbf{PoliceOSINT v1.0} end-to-end as sole engineer; achieved \textbf{55/55 unit tests passing} and reduced manual evidence triage by \textbf{70\%}}
+  \rI{Designed system architecture across \textbf{Next.js, FastAPI, PostgreSQL, Redis, Celery, Docker, and Nginx}; deployed behind Nginx reverse-proxy with full containerization}
+  \rI{Integrated \textbf{Groq/Llama 3.3 70b} AI copilot for automated FIR drafting and IPC/IT Act section mapping; self-taught LLM APIs and applied within sprint}
+  \rI{Built \textbf{IPDR Analyzer} processing \textbf{1,000+ IPs at sub-second latency} with batch GeoIP enrichment; validated requirements with law enforcement officers}
+\rLE
+
+\rSH{Cyber Crime Intern}{Jan 2026 -- Feb 2026}{Uttar Pradesh Police, Cyber Crime Department -- Lucknow, UP}{5 Weeks}
+\rLS
+  \rI{Analyzed \textbf{50+ real-world fraud cases} (phishing, UPI scams, investment fraud); mapped multi-hop fraud chains to expose race conditions in distributed payment systems}
+  \rI{Built \textbf{Python automation scripts} reducing manual triage time by \textbf{30\%}; presented findings clearly to senior officers with non-technical backgrounds}
+\rLE
+
+% PROJECTS
+\section{Projects}
+\rPH{\textbf{PoliceOSINT v1.0} \textbullet\ \textit{Next.js 14, FastAPI, Celery, Redis, PostgreSQL, Docker, Groq/Llama 3.3 70b, Nginx}}{2026}
+\rLS
+  \rI{\textbf{System Design:} Microservices platform with \textbf{10+ modules} (Identity, IP, Domain, UPI, Crypto, GEOINT, Social Media, Dark Web, Media Forensics) for horizontal scalability and module-level fault isolation}
+  \rI{\textbf{Concurrency \& Reliability:} Celery/Redis async task queues across \textbf{50+ sources}; fault-tolerant retries, worker health checks, and graceful degradation under partial failures}
+  \rI{\textbf{Performance, Security \& AI:} IPDR Analyzer processes \textbf{1,000+ IPs at sub-second latency}; SHA-256 chain-of-custody logging; Groq/Llama 3.3 70b for FIR generation and court-ready PDF reports}
+\rLE
+
+% RESEARCH
+\section{Research \& Publications}
+\rPH{\textbf{AI-Driven Fraud Detection Using Machine Learning Models} \textbullet\ \textit{NCMPCS-2026, DSMNRU}}{March 2026}
+\rLS
+  \rI{Benchmarked Random Forest, SVM, Logistic Regression, Gradient Boosting; achieved \textbf{85\%+ accuracy} on fraudulent UPI transaction detection; engineered behavioral and transactional feature sets from raw payment data}
+  \rI{Proposed scalable low-latency serving architecture; presented at \textbf{National Conference on Machine Learning and Predictive Analytics (NCMPCS-2026)}, DSMNRU}
+\rLE
+
+% EDUCATION
+\section{Education}
+\rSH{Dr. Shakuntala Mishra National Rehabilitation University}{Lucknow, India}{B.Tech in Computer Science and Engineering}{Graduating May 2027}
+{\small\hspace{0.13in}\textbf{Coursework:} Data Structures \& Algorithms, Operating Systems, Computer Networks, DBMS, Distributed Systems, Cyber Security}\vspace{1pt}
+
+% CERTIFICATIONS
+\section{Certifications \& Achievements}
+\vspace{1pt}{\small\begin{itemize}[leftmargin=0.13in,label=\textbullet,topsep=0pt,itemsep=0pt,parsep=0pt]
+  \item \textbf{GPCSSI 13th Batch 2026:} Gurugram Police Cyber Security Summer Internship -- competitively selected; PoliceOSINT v1.0 deployed in active law enforcement operations
+  \item \textbf{LeetCode:} %%LC_TOTAL%% problems solved (%%LC_EASY%% Easy, %%LC_MEDIUM%% Medium, %%LC_HARD%% Hard) \textbar\ %%LC_ACCEPT%% acceptance rate \textbar\ Beats 72.07\% globally
+  \item \textbf{Languages:} English (Fluent), Hindi (Native) \textbar\ \textbf{Availability:} Summer 2027 internships, May/June start
+\end{itemize}}
+
+\end{document}
