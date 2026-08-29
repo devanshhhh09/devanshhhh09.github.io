@@ -189,40 +189,19 @@ def patch_readme(stats, acceptance):
     # Replace everything between LC_STATS_START and LC_STATS_END
     acceptance_str = f"{acceptance}%" if acceptance else "N/A"
     new_block = f"""<!-- LC_STATS_START -->
-<div align="center">
-
-<table>
-<tr>
-<td align="center">✅ <b>Total Solved</b></td>
-<td align="center"><b>{stats['total']}</b></td>
-</tr>
-<tr>
-<td align="center">🟢 <b>Easy</b></td>
-<td align="center">{stats['easy']}</td>
-</tr>
-<tr>
-<td align="center">🟡 <b>Medium</b></td>
-<td align="center">{stats['medium']}</td>
-</tr>
-<tr>
-<td align="center">🔴 <b>Hard</b></td>
-<td align="center">{stats['hard']}</td>
-</tr>
-<tr>
-<td align="center">📊 <b>Acceptance Rate</b></td>
-<td align="center">{acceptance_str}</td>
-</tr>
-<tr>
-<td align="center">💻 <b>Language</b></td>
-<td align="center">C++</td>
-</tr>
-<tr>
-<td align="center">🎯 <b>Goal</b></td>
-<td align="center">250+ by December 2026</td>
-</tr>
-</table>
-
-</div>
+```
+  ┌─────────────────────────────────────────┐
+  │         LEETCODE STATS (LIVE)           │
+  ├──────────────────┬──────────────────────┤
+  │  Total Solved    │  {stats['total']:<20}│
+  │  Easy            │  {stats['easy']:<2}  🟢              │
+  │  Medium          │  {stats['medium']:<2}  🟡              │
+  │  Hard            │  {stats['hard']:<2}  🔴              │
+  │  Acceptance      │  {acceptance_str:<20}│
+  │  Language        │  C++                 │
+  │  Goal            │  250+ by Dec 2026    │
+  └──────────────────┴──────────────────────┘
+```
 <!-- LC_STATS_END -->"""
 
     readme = re.sub(
@@ -235,11 +214,11 @@ def patch_readme(stats, acceptance):
     # ── Google & Amazon Readiness block ──────────────────────────────────────
     ready_block = f"""<!-- LC_READY_START -->
 ```
-Distributed Systems  ████████████████████  Architected in Production (PoliceOSINT)
-Programming (C++)    ████████████████░░░░  {stats['total']}+ LeetCode · Daily Practice
-Algorithms & DSA     ██████████████░░░░░░  Arrays, Trees, HashMaps · Building Graphs & DP
-AI Integration       ████████████████████  Groq/Llama-3.3-70b in Production
-System Design        ████████████░░░░░░░░  Learning · PoliceOSINT as foundation
+  [████████████████████] Distributed Systems    → Architected in Production
+  [████████████████░░░░] DSA in C++ ({stats['total']}+)      → Daily Practice
+  [██████████████░░░░░░] Graphs & DP            → Active Focus
+  [████████████████████] AI Integration         → Shipped to Production
+  [████████████░░░░░░░░] System Design          → Building Intuition
 ```
 <!-- LC_READY_END -->"""
     readme = re.sub(
@@ -268,12 +247,44 @@ System Design        ████████████░░░░░░░�
         print(f"  ✅ README.md updated.")
 
 
+def patch_resume(stats, acceptance):
+    try:
+        with open("resume.html", "r", encoding="utf-8") as f:
+            resume = f.read()
+    except FileNotFoundError:
+        print("  resume.html not found — skipping.")
+        return
+
+    original = resume
+    acceptance_str = f"{acceptance}%" if acceptance else "75.6%"
+
+    new_block = f"""<!-- LC_RESUME_START -->
+    <span class="skill-val lc-inline"><span data-lc-total>{stats['total']}</span> problems solved ({stats['easy']} Easy, {stats['medium']} Medium, {stats['hard']} Hard) | <span data-lc-accept>{acceptance_str}</span> acceptance rate | Beats 72.07% globally</span>
+    <!-- LC_RESUME_END -->"""
+
+    resume = re.sub(
+        r'<!-- LC_RESUME_START -->.*?<!-- LC_RESUME_END -->',
+        new_block,
+        resume,
+        flags=re.DOTALL
+    )
+
+    if resume == original:
+        print("  resume.html: No changes.")
+    else:
+        with open("resume.html", "w", encoding="utf-8") as f:
+            f.write(resume)
+        print(f"  ✅ resume.html updated.")
+
+
 def main():
     print(f"Fetching LeetCode stats for @{USERNAME}...")
     stats      = fetch_stats()
     acceptance = fetch_acceptance()
     print(f"\nPatching {HTML_FILE}...")
     patch_html(stats, acceptance)
+    print(f"\nPatching resume.html...")
+    patch_resume(stats, acceptance)
     print(f"\nPatching README.md...")
     patch_readme(stats, acceptance)
 
