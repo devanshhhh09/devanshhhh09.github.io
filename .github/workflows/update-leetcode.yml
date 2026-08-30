@@ -44,13 +44,11 @@ jobs:
           cp portfolio/.github/workflows/update_leetcode.py ./update_leetcode.py
           cp portfolio/.github/workflows/build_resume.py ./build_resume.py
           cp portfolio/index.html ./index.html
-          cp portfolio/resume.html ./resume.html
           cp portfolio/resume.tex ./resume.tex
           cp profile/README.md ./README.md
           python update_leetcode.py
           python build_resume.py
           cp index.html portfolio/index.html
-          cp resume.html portfolio/resume.html
           cp resume.pdf portfolio/resume.pdf
           cp README.md profile/README.md
 
@@ -60,7 +58,7 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/devanshhhh09/devanshhhh09.github.io.git
-          git add index.html resume.html resume.pdf
+          git add index.html resume.pdf
           git diff --cached --quiet || git commit -m "chore: auto-update LeetCode stats [$(date +'%Y-%m-%d')]"
           git push
 
