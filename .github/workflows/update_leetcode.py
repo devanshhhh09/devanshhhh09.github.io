@@ -163,8 +163,16 @@ def patch_html(stats, acceptance):
     pattern = r'(Goal:\s*<span>)\d+\+(\s*problems)'
     match = re.search(pattern, html)
     if match:
-        goal = stats["total"] + 50  # always shows ~50 ahead as the next milestone
-        print(f"  Goal line: updating to {goal}+")
+        from datetime import date
+        today = date.today()
+        # Target: December 31, 2026
+        target_date = date(2026, 12, 31)
+        days_left = max((target_date - today).days, 1)
+        # Assume 2 problems/day pace → project forward
+        projected = stats["total"] + (days_left * 2)
+        # Round up to nearest 50 for a clean milestone goal
+        goal = ((projected // 50) + 1) * 50
+        print(f"  Goal line: {days_left} days left → projected {projected} → goal {goal}+")
         html = re.sub(pattern, rf'\g<1>{goal}+\2', html)
 
     # ── Write back ────────────────────────────────────────────────────────────
@@ -188,6 +196,10 @@ def patch_readme(stats, acceptance):
 
     # Replace everything between LC_STATS_START and LC_STATS_END
     acceptance_str = f"{acceptance}%" if acceptance else "N/A"
+    from datetime import date
+    days_left = max((date(2026, 12, 31) - date.today()).days, 1)
+    projected = stats["total"] + (days_left * 2)
+    goal = ((projected // 50) + 1) * 50
     new_block = f"""<!-- LC_STATS_START -->
 ```
   ┌─────────────────────────────────────────┐
@@ -199,7 +211,7 @@ def patch_readme(stats, acceptance):
   │  Hard            │  {stats['hard']:<2}  🔴              │
   │  Acceptance      │  {acceptance_str:<20}│
   │  Language        │  C++                 │
-  │  Goal            │  250+ by Dec 2026    │
+  │  Goal            │  {goal}+ by Dec 2026    │
   └──────────────────┴──────────────────────┘
 ```
 <!-- LC_STATS_END -->"""
@@ -258,9 +270,14 @@ def patch_resume(stats, acceptance):
     original = resume
     acceptance_str = f"{acceptance}%" if acceptance else "75.6%"
 
+    # Patch between LC_RESUME_START and LC_RESUME_END (certifications bullet)
     new_block = f"""<!-- LC_RESUME_START -->
-    <span class="skill-val lc-inline"><span data-lc-total>{stats['total']}</span> problems solved ({stats['easy']} Easy, {stats['medium']} Medium, {stats['hard']} Hard) | <span data-lc-accept>{acceptance_str}</span> acceptance rate | Beats 72.07% globally</span>
-    <!-- LC_RESUME_END -->"""
+  <ul>
+    <li><strong>GPCSSI 13th Batch 2026:</strong> Gurugram Police Cyber Security Summer Internship &mdash; competitively selected; PoliceOSINT v1.0 deployed in active law enforcement operations</li>
+    <li><strong>LeetCode:</strong> <span data-lc-total>{stats['total']}</span> problems solved (<span data-lc-easy>{stats['easy']}</span> Easy, <span data-lc-medium>{stats['medium']}</span> Medium, <span data-lc-hard>{stats['hard']}</span> Hard) | <span data-lc-accept>{acceptance_str}</span> acceptance rate | Beats 72.07% globally</li>
+    <li><strong>Languages:</strong> English (Fluent), Hindi (Native) | <strong>Availability:</strong> Summer 2027 internships, May/June start</li>
+  </ul>
+  <!-- LC_RESUME_END -->"""
 
     resume = re.sub(
         r'<!-- LC_RESUME_START -->.*?<!-- LC_RESUME_END -->',
@@ -268,6 +285,11 @@ def patch_resume(stats, acceptance):
         resume,
         flags=re.DOTALL
     )
+
+    # Also patch summary inline spans
+    resume = re.sub(r'(<span data-lc-total>)\d+(</span>)', rf'\g<1>{stats["total"]}\2', resume)
+    resume = re.sub(r'(<span data-lc-hard>)\d+(</span>)', rf'\g<1>{stats["hard"]}\2', resume)
+    resume = re.sub(r'(<span data-lc-accept>)[\d.]+%(</span>)', rf'\g<1>{acceptance_str}\2', resume)
 
     if resume == original:
         print("  resume.html: No changes.")
