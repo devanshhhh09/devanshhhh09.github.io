@@ -67,13 +67,20 @@ def fetch_stats():
 ACCEPT_QUERY = """
 query getUserAcceptance($username: String!) {
   matchedUser(username: $username) {
-    submitStatsGlobal {
+    problemsSolvedBeatsStats {
+      difficulty
+      percentage
+    }
+    submitStats: submitStatsGlobal {
       acSubmissionNum {
         difficulty
         count
         submissions
       }
     }
+  }
+  userContestRanking(username: $username) {
+    rating
   }
 }
 """
@@ -84,10 +91,27 @@ def fetch_acceptance():
         "Referer": "https://leetcode.com",
         "User-Agent": "Mozilla/5.0"
     }
-    payload = {
-        "query": ACCEPT_QUERY,
-        "variables": {"username": USERNAME}
+    # Use a different approach — fetch total accepted vs total submissions
+    # from the user's profile page stats
+    query = """
+query getUserStats($username: String!) {
+  matchedUser(username: $username) {
+    submitStats: submitStatsGlobal {
+      acSubmissionNum {
+        difficulty
+        count
+        submissions
+      }
+      totalSubmissionNum {
+        difficulty
+        count
+        submissions
+      }
     }
+  }
+}
+"""
+    payload = {"query": query, "variables": {"username": USERNAME}}
     try:
         resp = requests.post(LEETCODE_GRAPHQL, json=payload, headers=headers, timeout=15)
         resp.raise_for_status()
@@ -95,14 +119,25 @@ def fetch_acceptance():
         user = data.get("data", {}).get("matchedUser")
         if not user:
             return None
-        for item in user["submitStatsGlobal"]["acSubmissionNum"]:
+
+        ac_total = 0
+        total_submissions = 0
+
+        # Get accepted submissions count
+        for item in user["submitStats"]["acSubmissionNum"]:
             if item["difficulty"] == "All":
-                accepted    = item["count"]
-                submissions = item["submissions"]
-                if submissions > 0:
-                    rate = round((accepted / submissions) * 100, 1)
-                    print(f"    Acceptance: {rate}% ({accepted}/{submissions})")
-                    return rate
+                ac_total = item["submissions"]  # total accepted submissions
+
+        # Get total submissions count
+        for item in user["submitStats"]["totalSubmissionNum"]:
+            if item["difficulty"] == "All":
+                total_submissions = item["submissions"]  # total submissions
+
+        if total_submissions > 0:
+            rate = round((ac_total / total_submissions) * 100, 2)
+            print(f"    Acceptance: {rate}% ({ac_total} accepted / {total_submissions} total)")
+            return rate
+
     except Exception as e:
         print(f"  Acceptance fetch failed: {e}")
     return None
