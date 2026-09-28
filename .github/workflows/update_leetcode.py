@@ -64,19 +64,47 @@ def fetch_stats():
     return {"total": total, "easy": easy, "medium": medium, "hard": hard}
 
 
+ACCEPT_QUERY = """
+query getUserAcceptance($username: String!) {
+  matchedUser(username: $username) {
+    submitStatsGlobal {
+      acSubmissionNum {
+        difficulty
+        count
+        submissions
+      }
+    }
+  }
+}
+"""
+
 def fetch_acceptance():
-    url = f"https://leetcode-stats-api.herokuapp.com/{USERNAME}"
+    headers = {
+        "Content-Type": "application/json",
+        "Referer": "https://leetcode.com",
+        "User-Agent": "Mozilla/5.0"
+    }
+    payload = {
+        "query": ACCEPT_QUERY,
+        "variables": {"username": USERNAME}
+    }
     try:
-        resp = requests.get(url, timeout=10)
+        resp = requests.post(LEETCODE_GRAPHQL, json=payload, headers=headers, timeout=15)
         resp.raise_for_status()
-        d = resp.json()
-        rate = d.get("acceptanceRate", None)
-        if rate is not None:
-            result = round(float(rate), 1)
-            print(f"    Acceptance: {result}%")
-            return result
+        data = resp.json()
+        user = data.get("data", {}).get("matchedUser")
+        if not user:
+            return None
+        for item in user["submitStatsGlobal"]["acSubmissionNum"]:
+            if item["difficulty"] == "All":
+                accepted    = item["count"]
+                submissions = item["submissions"]
+                if submissions > 0:
+                    rate = round((accepted / submissions) * 100, 1)
+                    print(f"    Acceptance: {rate}% ({accepted}/{submissions})")
+                    return rate
     except Exception as e:
-        print(f"  Acceptance rate fetch failed (non-critical): {e}")
+        print(f"  Acceptance fetch failed: {e}")
     return None
 
 
