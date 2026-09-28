@@ -179,7 +179,7 @@ def patch_html(stats, acceptance):
 
     # ── Acceptance rate ───────────────────────────────────────────────────────
     if acceptance is not None:
-        pattern = r'(<span class="metric-value">)[\d.]+%(<\/span>\s*<span class="metric-label">Acceptance Rate)'
+        pattern = r'(<span class="mv">)[\d.]+%(<\/span><span class="ml">Acceptance Rate)'
         match = re.search(pattern, html)
         if match:
             print(f"  Acceptance: found → replacing with {acceptance}%")
