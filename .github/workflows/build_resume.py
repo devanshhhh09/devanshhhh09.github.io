@@ -56,17 +56,39 @@ def fetch_stats():
     }
 
 def fetch_acceptance():
+    headers = {
+        "Content-Type": "application/json",
+        "Referer": "https://leetcode.com",
+        "User-Agent": "Mozilla/5.0"
+    }
+    query = """
+query getUserStats($username: String!) {
+  matchedUser(username: $username) {
+    submitStats: submitStatsGlobal {
+      acSubmissionNum { difficulty count submissions }
+      totalSubmissionNum { difficulty count submissions }
+    }
+  }
+}
+"""
     try:
-        url = f"https://leetcode-stats-api.herokuapp.com/{USERNAME}"
-        resp = requests.get(url, timeout=10)
+        resp = requests.post("https://leetcode.com/graphql",
+                             json={"query": query, "variables": {"username": USERNAME}},
+                             headers=headers, timeout=15)
         resp.raise_for_status()
-        d = resp.json()
-        rate = d.get("acceptanceRate", None)
-        if rate is not None:
-            return round(float(rate), 1)
+        data = resp.json()
+        user = data.get("data", {}).get("matchedUser")
+        if not user:
+            return 75.6
+        ac_total = next((i["submissions"] for i in user["submitStats"]["acSubmissionNum"]    if i["difficulty"] == "All"), 0)
+        total    = next((i["submissions"] for i in user["submitStats"]["totalSubmissionNum"] if i["difficulty"] == "All"), 0)
+        if total > 0:
+            rate = round((ac_total / total) * 100, 2)
+            print(f"  Acceptance: {rate}% ({ac_total}/{total})")
+            return rate
     except Exception as e:
         print(f"  Acceptance fetch failed: {e}")
-    return 75.6  # fallback
+    return 75.6
 
 def build_pdf(stats, acceptance):
     # Read template
